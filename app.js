@@ -694,21 +694,21 @@
         <div class="word-reading">(${item.reading || ''})</div>
         <div class="word-pos">${item.pos}</div>
       </div>
-      <div class="word-meaning">${item.meaning}</div>
+      <div class="word-meaning hidden-meaning" data-placeholder="タップして日本語訳を表示">${item.meaning}</div>
 
       <div class="card-phrase-box">
         <div class="phrase-ru-row">
           <span class="phrase-ru">${item.phrase_ru}</span>
           <button class="audio-mini-btn phrase-audio-btn" data-audio="${item.phrase_clean}" title="例文フレーズを発音">🔊</button>
         </div>
-        <div class="phrase-ja">${item.phrase_ja}</div>
+        <div class="phrase-ja hidden-meaning" data-placeholder="タップして日本語訳を表示">${item.phrase_ja}</div>
       </div>
 
       ${aspectHtml}
       ${grammarHtml}
     `;
 
-    // クリックイベント
+    // クリックイベント（カードタップで日本語訳の表示/非表示を切り替え）
     el.addEventListener('click', (e) => {
       // 星アイコンクリック時
       if (e.target.closest('.star-icon-btn')) {
@@ -723,8 +723,9 @@
         speakRussian(text);
         return;
       }
-      // カードクリックで詳細モーダル表示
-      openDetailModal(item);
+      
+      // 単語カードタップで日本語訳をトグル表示
+      el.classList.toggle('revealed');
     });
 
     return el;

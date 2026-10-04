@@ -616,9 +616,52 @@ body {
 }
 
 .word-meaning {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
+  min-height: 22px;
+  transition: all var(--transition-fast);
+}
+
+/* 日本語訳の隠し・タップ表示スタイル */
+.hidden-meaning {
+  position: relative;
+  color: transparent !important;
+  user-select: none;
+  background-color: rgba(148, 163, 184, 0.12);
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-block;
+}
+
+.hidden-meaning::before {
+  content: "タップで和訳を表示";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+.vocab-card.revealed .hidden-meaning {
+  color: var(--text-primary) !important;
+  user-select: auto;
+  background-color: transparent;
+  padding: 0;
+}
+
+.vocab-card.revealed .phrase-ja.hidden-meaning {
+  color: var(--text-secondary) !important;
+}
+
+.vocab-card.revealed .hidden-meaning::before {
+  display: none;
 }
 
 /* ミニマルフレーズボックス */
@@ -629,7 +672,7 @@ body {
   padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .phrase-ru-row {
@@ -699,6 +742,8 @@ body {
 .phrase-ja {
   font-size: 13px;
   color: var(--text-secondary);
+  min-height: 20px;
+  transition: all var(--transition-fast);
 }
 
 .card-aspect-note {
