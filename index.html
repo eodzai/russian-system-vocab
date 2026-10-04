@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>システム露単語 - ロシア語日常会話 2,000語 アプリ</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="システム露単語">
+  <link rel="apple-touch-icon" href="app_icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0f19">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="app_icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-mode">
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <img src="app_icon.png" class="logo-icon-img" alt="ロシア国旗" style="width: 34px; height: 34px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+        <div>
+          <h1 class="logo-title">システム露単語 <span class="badge-ver">Ver 2.0</span></h1>
+          <p class="logo-subtitle">日常会話特化 2,000語（ミニマルフレーズ・体のペア・格支配・音声合成）</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" id="openAudioSettingsBtn" class="ai-voice-btn" title="人間クオリティのNeural AI音声設定・声質微調整を開く">
+          <span class="ai-sparkle">✨</span>
+          <span class="ai-btn-text">AI音声・声質設定</span>
+          <span class="ai-badge neural" id="aiActiveBadge">Neural AI</span>
+        </button>
+        <div class="tts-speed-control">
+          <span class="control-label">速度:</span>
+          <button type="button" class="speed-btn active" data-speed="1.0">1.0x</button>
+          <button type="button" class="speed-btn" data-speed="0.8">0.8x 🐢</button>
+        </div>
+        <button id="themeToggleBtn" class="icon-btn" title="テーマ切り替え">🌓</button>
+      </div>
+    </div>
+
+    <!-- ステージ切り替えタブ -->
+    <nav class="stage-nav">
+      <button class="stage-tab active" data-stage="all">
+        全ステージ <span class="tab-count" id="countAll">2000</span>
+      </button>
+      <button class="stage-tab" data-stage="1">
+        Stage 1: 基礎日常会話 <span class="tab-count" id="countS1">500</span>
+      </button>
+      <button class="stage-tab" data-stage="2">
+        Stage 2: 日常生活・街歩き <span class="tab-count" id="countS2">600</span>
+      </button>
+      <button class="stage-tab" data-stage="3">
+        Stage 3: 感情・意見・トラブル <span class="tab-count" id="countS3">600</span>
+      </button>
+      <button class="stage-tab" data-stage="4">
+        Stage 4: 多義語・口語・イディオム <span class="tab-count" id="countS4">300</span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <!-- モード切り替えバー -->
+    <div class="mode-bar">
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="list">📖 単語帳（一覧）</button>
+        <button class="mode-tab" data-mode="card">🎴 単語カード（暗記）</button>
+        <button class="mode-tab" data-mode="quiz">🎯 4択テスト（クイズ）</button>
+        <button class="mode-tab" data-mode="starred">⭐ 要復習リスト <span class="star-badge" id="starBadge">0</span></button>
+      </div>
+      <div class="export-actions">
+        <button id="exportAnkiBtn" class="export-btn" title="Anki用TSVファイルをダウンロード">
+          📥 Anki用TSV保存
+        </button>
+      </div>
+    </div>
+
+    <!-- 検索・フィルターエリア -->
+    <section class="filter-section">
+      <div class="search-box-wrapper">
+        <div class="search-input-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="ロシア語、日本語、読み（カタカナ）、英語で検索..." autocomplete="off">
+          <button id="clearSearchBtn" class="clear-btn">✕</button>
+        </div>
+        <!-- キリル文字入力アシスト（全33文字対応） -->
+        <div class="cyrillic-quick-keys">
+          <span class="quick-keys-label">キリル入力補助:</span>
+          <button class="cyr-key" data-char="а">а</button>
+          <button class="cyr-key" data-char="б">б</button>
+          <button class="cyr-key" data-char="в">в</button>
+          <button class="cyr-key" data-char="г">г</button>
+          <button class="cyr-key" data-char="д">д</button>
+          <button class="cyr-key" data-char="е">е</button>
+          <button class="cyr-key" data-char="ё">ё</button>
+          <button class="cyr-key" data-char="ж">ж</button>
+          <button class="cyr-key" data-char="з">з</button>
+          <button class="cyr-key" data-char="и">и</button>
+          <button class="cyr-key" data-char="й">й</button>
+          <button class="cyr-key" data-char="к">к</button>
+          <button class="cyr-key" data-char="л">л</button>
+          <button class="cyr-key" data-char="м">м</button>
+          <button class="cyr-key" data-char="н">н</button>
+          <button class="cyr-key" data-char="о">о</button>
+          <button class="cyr-key" data-char="п">п</button>
+          <button class="cyr-key" data-char="р">р</button>
+          <button class="cyr-key" data-char="с">с</button>
+          <button class="cyr-key" data-char="т">т</button>
+          <button class="cyr-key" data-char="у">у</button>
+          <button class="cyr-key" data-char="ф">ф</button>
+          <button class="cyr-key" data-char="х">х</button>
+          <button class="cyr-key" data-char="ц">ц</button>
+          <button class="cyr-key" data-char="ч">ч</button>
+          <button class="cyr-key" data-char="ш">ш</button>
+          <button class="cyr-key" data-char="щ">щ</button>
+          <button class="cyr-key" data-char="ъ">ъ</button>
+          <button class="cyr-key" data-char="ы">ы</button>
+          <button class="cyr-key" data-char="ь">ь</button>
+          <button class="cyr-key" data-char="э">э</button>
+          <button class="cyr-key" data-char="ю">ю</button>
+          <button class="cyr-key" data-char="я">я</button>
+          <button class="cyr-key-backspace" id="cyrBackspaceBtn" title="1文字消去">⌫</button>
+        </div>
+      </div>
+
+      <div class="filter-controls">
+        <div class="filter-group">
+          <label for="categoryFilter">カテゴリー:</label>
+          <select id="categoryFilter">
+            <option value="all">すべてのカテゴリー</option>
+            <!-- JSで動的生成 -->
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="posFilter">品詞:</label>
+          <select id="posFilter">
+            <option value="all">すべての品詞</option>
+            <option value="動詞">動詞</option>
+            <option value="名詞">名詞</option>
+            <option value="形容詞">形容詞</option>
+            <option value="副詞">副詞</option>
+            <option value="表現">表現・成句・イディオム</option>
+            <option value="代名詞">代名詞・疑問詞</option>
+            <option value="前置詞">前置詞・接続詞</option>
+          </select>
+        </div>
+        <div class="stats-info">
+          表示中: <b id="filteredCount">0</b> / 2000 語
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. 単語帳（一覧表示モード） -->
+    <section id="viewList" class="view-panel active">
+      <div id="vocabList" class="vocab-grid">
+        <!-- JSで単語カードを自動生成 -->
+      </div>
+      <div class="pagination-area" id="paginationArea">
+        <button id="loadMoreBtn" class="load-more-btn">さらに表示する（残り <span id="remainingCount">0</span> 語）</button>
+      </div>
+    </section>
+
+    <!-- 2. 単語カード（暗記フラッシュカードモード） -->
+    <section id="viewCard" class="view-panel">
+      <div class="card-trainer-container">
+        <div class="card-progress-bar">
+          <div class="progress-fill" id="cardProgressFill"></div>
+        </div>
+        <div class="card-header-status">
+          <span id="cardPositionIndicator">1 / 500</span>
+          <span class="card-stage-pill" id="cardStagePill">Stage 1</span>
+        </div>
+
+        <div class="flashcard-wrapper">
+          <div class="flashcard" id="flashcard">
+            <!-- 表面 (単語メイン・ミニマルフレーズはサブ) -->
+            <div class="card-side card-front">
+              <div class="card-top-meta">
+                <span class="badge-cat" id="cardCategory">挨拶</span>
+                <button class="star-btn" id="cardStarBtn" title="要復習リストに追加">★</button>
+              </div>
+
+              <!-- メイン：見出し語（大きく強調） -->
+              <div class="card-hero-word-section">
+                <div class="card-headword-wrap">
+                  <h2 class="card-headword" id="cardWord">здравствуйте</h2>
+                </div>
+                <div class="card-headword-sub">
+                  <span class="card-reading" id="cardReading">(ズドラーストヴイチェ)</span>
+                  <span class="card-pos" id="cardPos">間投詞</span>
+                </div>
+              </div>
+
+              <!-- サブ：シス単式 ミニマルフレーズ（文脈の補助） -->
+              <div class="card-phrase-sub-box">
+                <div class="card-phrase-label">💬 シス単式 ミニマルフレーズ</div>
+                <div class="card-phrase-ru" id="cardPhraseRu">Здра́вствуйте, как дела́?</div>
+              </div>
+
+              <div class="card-play-row">
+                <button class="audio-play-card word primary-audio" id="cardAudioWordBtn" title="単語の発音を聴く (Wキー)">
+                  <span class="speaker-icon">🔊</span> 単語を発音
+                </button>
+                <button class="audio-play-card phrase secondary-audio" id="cardAudioPhraseBtn" title="例文フレーズの発音を聴く (Pキー)">
+                  <span class="speaker-icon">💬</span> 例文を聴く
+                </button>
+              </div>
+              <div class="card-flip-hint">👆 クリックまたは [Space] キーで裏返す</div>
+            </div>
+
+            <!-- 裏面 (日本語の意味メイン・例文訳はサブ) -->
+            <div class="card-side card-back">
+              <div class="card-top-meta">
+                <span class="back-word-reminder">
+                  <b id="cardBackWord">здравствуйте</b> <span id="cardBackReading">(ズドラーストヴイチェ)</span>
+                </span>
+              </div>
+
+              <!-- メイン：単語の意味（大きく強調） -->
+              <div class="card-hero-meaning-section">
+                <div class="back-meaning-label">単語の意味</div>
+                <h2 class="card-hero-meaning" id="cardMeaning">こんにちは（丁寧）</h2>
+              </div>
+
+              <!-- サブ：例文の日本語訳 -->
+              <div class="card-phrase-sub-box back">
+                <div class="card-phrase-label">💬 例文の訳</div>
+                <div class="back-phrase-ja" id="cardPhraseJa">こんにちは、お元気ですか？</div>
+              </div>
+
+              <div class="back-extra-info">
+                <div class="back-detail-row" id="cardAspectRow">
+                  <span class="detail-label">動詞の体ペア:</span>
+                  <span class="detail-value text-aspect" id="cardAspect">-</span>
+                </div>
+                <div class="back-detail-row" id="cardGrammarRow">
+                  <span class="detail-label">文法・語法ノート:</span>
+                  <span class="detail-value" id="cardGrammar">-</span>
+                </div>
+              </div>
+
+              <div class="card-play-row">
+                <button class="audio-play-card word primary-audio" id="cardAudioBackWordBtn" title="単語の発音 (Wキー)">
+                  <span class="speaker-icon">🔊</span> 単語
+                </button>
+                <button class="audio-play-card phrase secondary-audio" id="cardAudioBackPhraseBtn" title="例文の発音 (Pキー)">
+                  <span class="speaker-icon">💬</span> 例文
+                </button>
+              </div>
+              <div class="card-flip-hint">👆 クリックで表面に戻る</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- コントロールボタン -->
+        <div class="card-controls">
+          <button id="cardPrevBtn" class="nav-control-btn" title="前の単語 (←キー)">◀ 前へ</button>
+          <button id="cardFlipBtn" class="action-control-btn" title="答えを見る (Spaceキー)">カードをめくる</button>
+          <button id="cardNextBtn" class="nav-control-btn primary" title="次の単語 (→キー)">次へ ▶</button>
+        </div>
+        <div class="card-extra-controls">
+          <button id="cardShuffleBtn" class="sub-control-btn">🔀 シャッフル</button>
+          <button id="cardAutoPlayBtn" class="sub-control-btn">▶ 自動音声再生: <span id="autoPlayStatus">OFF</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. テスト・クイズモード -->
+    <section id="viewQuiz" class="view-panel">
+      <div class="quiz-container">
+        <div class="quiz-score-board">
+          <div class="score-item">問題: <b id="quizCurrentIndex">1</b> / <span id="quizTotalCount">10</span></div>
+          <div class="score-item">正解数: <b id="quizScore">0</b></div>
+          <div class="score-item">正解率: <b id="quizAccuracy">0%</b></div>
+        </div>
+
+        <div class="quiz-card" id="quizCard">
+          <div class="quiz-badge" id="quizTypeBadge">単語の意味当て (ロシア語 ➔ 日本語)</div>
+          <div class="quiz-question-box">
+            <div class="quiz-question-text" id="quizQuestion">...</div>
+            <div class="quiz-question-sub" id="quizQuestionSub"></div>
+            <div class="quiz-audio-row">
+              <button class="quiz-sound-btn word" id="quizAudioWordBtn" title="単語の発音">🔊 単語を聴く</button>
+            </div>
+          </div>
+
+          <div class="quiz-options-grid" id="quizOptions">
+            <!-- 4択ボタンが動的挿入 -->
+          </div>
+
+          <div class="quiz-explanation" id="quizExplanation" style="display: none;">
+            <div class="expl-header" id="explHeader">正解！ 🎉</div>
+            <div class="expl-body" id="explBody">解説テキスト</div>
+            <button id="quizNextQuestionBtn" class="quiz-next-btn">次の問題へ 進む ▶</button>
+          </div>
+        </div>
+
+        <!-- クイズ終了サマリー -->
+        <div class="quiz-result-card" id="quizResultCard" style="display: none;">
+          <h2>テスト終了！お疲れ様でした 🎉</h2>
+          <div class="result-score-circle" id="resultScoreCircle">8 / 10</div>
+          <p class="result-message" id="resultMessage">素晴らしい！この調子で語彙を定着させましょう。</p>
+          <div class="result-actions">
+            <button id="retryQuizBtn" class="action-btn primary">もう一度テストする</button>
+            <button id="retryMissedBtn" class="action-btn secondary">間違えた単語だけ復習する</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 要復習リスト（ブックマーク） -->
+    <section id="viewStarred" class="view-panel">
+      <div class="starred-header">
+        <h2>⭐ 要復習・お気に入り単語リスト</h2>
+        <p>あなたがチェックした苦手な単語や重要な表現の一覧です（ブラウザに自動保存されます）。</p>
+        <div class="starred-actions">
+          <button id="clearAllStarredBtn" class="sub-control-btn danger">全ブックマーク解除</button>
+        </div>
+      </div>
+      <div id="starredList" class="vocab-grid">
+        <!-- ブックマーク単語が動的表示 -->
+      </div>
+      <div id="starredEmpty" class="empty-placeholder" style="display: none;">
+        <div class="empty-icon">⭐</div>
+        <p>まだ要復習単語が登録されていません。<br>単語カードや一覧の「★」アイコンをクリックして追加しましょう！</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- 単語詳細モーダル -->
+  <div id="detailModal" class="modal-overlay">
+    <div class="modal-content">
+      <button id="modalCloseBtn" class="modal-close">&times;</button>
+      <div class="modal-header">
+        <span class="modal-stage" id="modalStage">Stage 1</span>
+        <span class="modal-category" id="modalCategory">日常</span>
+      </div>
+      <div class="modal-word-row">
+        <h2 class="modal-word" id="modalWord">сло́во</h2>
+        <span class="modal-reading" id="modalReading">(スローヴァ)</span>
+        <button class="audio-play-modal word" id="modalAudioWordBtn" title="単語単体を発音">🔊 単語</button>
+      </div>
+      <div class="modal-pos" id="modalPos">名詞 (中)</div>
+      
+      <div class="modal-meaning-box">
+        <div class="modal-meaning" id="modalMeaning">言葉、単語</div>
+      </div>
+
+      <div class="modal-phrase-card">
+        <div class="phrase-card-label">シス単式 ミニマルフレーズ:</div>
+        <div class="modal-phrase-ru" id="modalPhraseRu">Но́вое сло́во</div>
+        <div class="modal-phrase-ja" id="modalPhraseJa">新しい単語</div>
+        <button class="audio-play-modal phrase" id="modalAudioPhraseBtn" title="例文フレーズを発音">💬 例文を聴く</button>
+      </div>
+
+      <div class="modal-info-grid">
+        <div class="info-block" id="modalAspectBlock">
+          <div class="info-title">動詞の体（НСВ / СВ）</div>
+          <div class="info-content" id="modalAspect">сказать / говорить</div>
+        </div>
+        <div class="info-block">
+          <div class="info-title">文法・格支配ノート</div>
+          <div class="info-content" id="modalGrammar">複数形: слова́</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI音声・声質カスタマイズモーダル -->
+  <div id="audioSettingsModal" class="modal-overlay">
+      <div class="modal-card audio-settings-card">
+        <div class="modal-header">
+          <div>
+            <h2 class="modal-title">🎙️ AI音声・声質カスタマイズ</h2>
+            <p class="modal-subtitle">深層学習（Neural TTS）による人間らしいスタジオ品質の発音と、お好みの声質への微調整</p>
+          </div>
+          <button id="closeAudioSettingsBtn" class="modal-close" title="閉じる">&times;</button>
+        </div>
+
+        <div class="audio-settings-body">
+          <!-- サーバー状態表示 -->
+          <div class="server-status-banner" id="serverStatusBanner">
+            <span class="status-indicator-dot online" id="serverStatusDot"></span>
+            <span id="serverStatusText">Neural AI音声エンジン: 接続中...</span>
+          </div>
+
+          <!-- 音声エンジン選択 -->
+          <div class="setting-group">
+            <label class="setting-label">音声エンジン</label>
+            <div class="engine-choice-grid">
+              <label class="engine-radio-card active" id="engineCardNeural">
+                <input type="radio" name="ttsEngine" value="neural" checked>
+                <div class="engine-card-content">
+                  <div class="engine-card-title">🌟 Neural AI音声 (推奨・スタジオ音質)</div>
+                  <div class="engine-card-desc">人間の声優・アナウンサーによる自然な深層学習ボイス。微調整対応</div>
+                </div>
+              </label>
+              <label class="engine-radio-card" id="engineCardBrowser">
+                <input type="radio" name="ttsEngine" value="browser">
+                <div class="engine-card-content">
+                  <div class="engine-card-title">💻 ブラウザ標準音声 (オフライン)</div>
+                  <div class="engine-card-desc">Windows/ブラウザ内蔵の標準音声合成エンジン</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Neural AI ボイス設定コンテナ -->
+          <div id="neuralSettingsContainer">
+            <!-- 話者選択 -->
+            <div class="setting-group">
+              <label class="setting-label">話者 (キャラクター)</label>
+              <div class="voice-actor-grid">
+                <button type="button" class="voice-actor-btn active" data-voice="ru-RU-SvetlanaNeural">
+                  <span class="actor-avatar">👩</span>
+                  <div class="actor-info">
+                    <div class="actor-name">スヴェトラーナ (Svetlana)</div>
+                    <div class="actor-desc">自然で透明感のある女性声。日常会話・単語学習に最適</div>
+                  </div>
+                </button>
+                <button type="button" class="voice-actor-btn" data-voice="ru-RU-DmitryNeural">
+                  <span class="actor-avatar">👨</span>
+                  <div class="actor-info">
+                    <div class="actor-name">ドミトリー (Dmitry)</div>
+                    <div class="actor-desc">落ち着きと温かみのある男性声。安定した低音リスニングに最適</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- 声の高さ・ピッチ (Hz) -->
+            <div class="setting-group">
+              <div class="setting-label-row">
+                <label class="setting-label" for="pitchSlider">声の高さ・キャラクター (Pitch)</label>
+                <span class="setting-value-badge" id="pitchValueBadge">+35 Hz (アニメヒロイン風)</span>
+              </div>
+              <div class="presets-row">
+                <button type="button" class="preset-pill active" data-pitch="35" data-preset="anime">🌸 アニメヒロイン (+35Hz)</button>
+                <button type="button" class="preset-pill" data-pitch="15" data-preset="friendly">☀️ フレンドリー女性 (+15Hz)</button>
+                <button type="button" class="preset-pill" data-pitch="0" data-preset="news">🎙️ 標準アナウンサー (0Hz)</button>
+                <button type="button" class="preset-pill" data-pitch="-20" data-preset="deep">☕ 落ち着いた低音 (-20Hz)</button>
+              </div>
+              <div class="slider-wrapper">
+                <span class="slider-boundary">-40Hz</span>
+                <input type="range" id="pitchSlider" min="-40" max="60" step="5" value="35">
+                <span class="slider-boundary">+60Hz</span>
+              </div>
+              <p class="setting-note">※ 声帯の基本周波数を自然に変化させるため、音質を劣化させずにキュートまたは落ち着いた声に調整できます。</p>
+            </div>
+
+            <!-- 話速 (Rate %) -->
+            <div class="setting-group">
+              <div class="setting-label-row">
+                <label class="setting-label" for="rateSlider">話速 (Speed)</label>
+                <span class="setting-value-badge" id="rateValueBadge">0% (標準スピード)</span>
+              </div>
+              <div class="presets-row">
+                <button type="button" class="preset-pill rate-pill" data-rate="-15">🐢 ゆっくり (-15%)</button>
+                <button type="button" class="preset-pill rate-pill active" data-rate="0">⚡ 標準 (0%)</button>
+                <button type="button" class="preset-pill rate-pill" data-rate="10">🚀 少し速め (+10%)</button>
+              </div>
+              <div class="slider-wrapper">
+                <span class="slider-boundary">-30%</span>
+                <input type="range" id="rateSlider" min="-30" max="30" step="5" value="0">
+                <span class="slider-boundary">+30%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ブラウザ標準音声設定コンテナ (ブラウザモード時) -->
+          <div id="browserSettingsContainer" style="display: none;">
+            <div class="setting-group">
+              <label class="setting-label">OS内蔵話者</label>
+              <select id="voiceSelect" class="voice-dropdown" style="width: 100%;">
+                <option value="auto">自動選択 (ロシア語)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 試聴プレビューセクション -->
+          <div class="preview-section">
+            <label class="setting-label">試聴テスト (カスタマイズした声質の確認)</label>
+            <div class="preview-controls">
+              <select id="previewPhraseSelect" class="preview-select">
+                <option value="Здра́вствуйте! Прия́тно познако́миться.">Здра́вствуйте! Прия́тно познако́миться. (こんにちは！はじめまして)</option>
+                <option value="Как ваши дела́? Всё отли́чно, спаси́бо!">Как ваши дела́? Всё отли́чно, спаси́бо! (お元気ですか？絶好調です！)</option>
+                <option value="Я изуча́ю ру́сский язы́к ка́ждый день.">Я изуча́ю ру́сский язы́к ка́ждый день. (毎日ロシア語を勉強しています)</option>
+                <option value="Спаси́бо большо́е! До свида́ния!">Спаси́бо большо́е! До свида́ния! (本当にありがとう！さようなら！)</option>
+              </select>
+              <button type="button" id="previewPlayBtn" class="preview-play-btn">
+                <span class="preview-icon">▶</span>
+                <span id="previewPlayBtnText">この声で試聴する</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Switch / Android 音声エンジン案内 -->
+          <div id="androidTtsInfoBox" style="margin-top: 18px; padding: 14px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px;">
+            <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <span>🎮</span> <span>Nintendo Switch 音声エンジン案内</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">
+              Wi-Fi接続時はネイティブ発音（高音質オンライン音声）が自動再生され、一度再生した単語は本体に自動キャッシュ保存されます。<br>
+              完全オフラインで即時発音させるには、LineageOSにロシア語音声（Google音声認識と合成、またはRHVoice等）をインストールしてください。
+            </p>
+            <button type="button" id="openAndroidTtsSettingsBtn" class="btn-secondary" style="font-size: 13px; padding: 6px 12px; cursor: pointer;">
+              ⚙️ Android本体のTTS（読み上げ）設定を開く
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="resetAudioSettingsBtn" class="btn-secondary">初期値に戻す</button>
+          <button type="button" id="saveAudioSettingsBtn" class="btn-primary">保存して閉じる</button>
+        </div>
+      </div>
+    </div>
+
+  <footer class="app-footer">
+    <p>ロシア語システム単語帳 (System Russian Vocab 2000) &bull; 日常会話学習に最適化されたミニマルフレーズ方式</p>
+  </footer>
+
+  <!-- データ読み込み（file://直接起動時用JSバンドル + fetchフォールバック） -->
+  <script src="data/vocab_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
