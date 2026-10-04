@@ -156,63 +156,45 @@
 
     try {
       window.speechSynthesis.cancel();
-      window.speechSynthesis.resume();
     } catch(e) {}
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'ru-RU';
-    utterance.rate = state.ttsSpeed || 1.0;
+    // iOS Safari / Chrome では Utterance が即座に GC (ガベージコレクション) されて無音になるバグがあるため window に保持
+    window.currentUtterance = new SpeechSynthesisUtterance(cleanText);
+    window.currentUtterance.lang = 'ru-RU';
+    window.currentUtterance.rate = state.ttsSpeed || 1.0;
 
     const voices = window.speechSynthesis.getVoices();
     let chosenVoice = null;
-
     if (state.selectedVoiceURI && state.selectedVoiceURI !== 'auto') {
       chosenVoice = voices.find(v => (v.voiceURI === state.selectedVoiceURI || v.name === state.selectedVoiceURI));
     }
-    if (!chosenVoice) {
-      chosenVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ru'));
-    }
+    // iOS では指定せず lang='ru-RU' のみの方が確実にシステム音声（Milena等）が再生される場合があるため、明示的選択時のみセット
     if (chosenVoice) {
-      utterance.voice = chosenVoice;
+      window.currentUtterance.voice = chosenVoice;
     }
 
     let finished = false;
     const finishHandler = () => {
       if (finished) return;
       finished = true;
+      window.currentUtterance = null;
       if (onEnd) onEnd();
     };
 
-    utterance.onend = finishHandler;
+    window.currentUtterance.onend = finishHandler;
 
-    utterance.onerror = (e) => {
-      console.warn('[SpeechSynthesis error, falling back to Google TTS]:', e);
+    window.currentUtterance.onerror = (e) => {
+      console.warn('[SpeechSynthesis error]:', e);
       if (!finished) {
-        finished = true;
-        playOnlineGoogleTts(cleanText, onEnd);
+        finishHandler();
       }
-    };
-
-    // iOS WebKit では発音データがダウンロードされていない場合、onend も onerror も発火しないことがあるためタイマー監視
-    const fallbackTimer = setTimeout(() => {
-      if (!finished && !window.speechSynthesis.speaking) {
-        console.warn('[SpeechSynthesis timeout, falling back to Google TTS]');
-        finished = true;
-        playOnlineGoogleTts(cleanText, onEnd);
-      }
-    }, 1200);
-
-    const origFinish = finishHandler;
-    utterance.onend = () => {
-      clearTimeout(fallbackTimer);
-      origFinish();
     };
 
     try {
-      window.speechSynthesis.speak(utterance);
+      window.speechSynthesis.speak(window.currentUtterance);
     } catch (e) {
-      clearTimeout(fallbackTimer);
-      playOnlineGoogleTts(cleanText, onEnd);
+      console.error('[SpeechSynthesis speak error]:', e);
+      finishHandler();
     }
   }
 
