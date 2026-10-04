@@ -391,18 +391,18 @@
           <div class="setting-group">
             <label class="setting-label">音声エンジン</label>
             <div class="engine-choice-grid">
-              <label class="engine-radio-card active" id="engineCardNeural">
-                <input type="radio" name="ttsEngine" value="neural" checked>
+              <label class="engine-radio-card" id="engineCardNeural">
+                <input type="radio" name="ttsEngine" value="neural">
                 <div class="engine-card-content">
-                  <div class="engine-card-title">🌟 Neural AI音声 (推奨・スタジオ音質)</div>
-                  <div class="engine-card-desc">人間の声優・アナウンサーによる自然な深層学習ボイス。微調整対応</div>
+                  <div class="engine-card-title">🌟 Neural AI音声 (PCローカルサーバー用)</div>
+                  <div class="engine-card-desc">PC上でローカルAIサーバーを動かしている場合に使用可能</div>
                 </div>
               </label>
-              <label class="engine-radio-card" id="engineCardBrowser">
-                <input type="radio" name="ttsEngine" value="browser">
+              <label class="engine-radio-card active" id="engineCardBrowser">
+                <input type="radio" name="ttsEngine" value="browser" checked>
                 <div class="engine-card-content">
-                  <div class="engine-card-title">💻 ブラウザ標準音声 (オフライン)</div>
-                  <div class="engine-card-desc">Windows/ブラウザ内蔵の標準音声合成エンジン</div>
+                  <div class="engine-card-title">📱 ブラウザ/OS標準音声 (iOS/スマホ推奨・オフライン)</div>
+                  <div class="engine-card-desc">iPhone、iPad、スマホ、ブラウザ標準の音声合成エンジン</div>
                 </div>
               </label>
             </div>
