@@ -32,7 +32,7 @@
     quizMissed: [],
 
     // 音声設定 (Neural AI & 声質カスタマイズ)
-    ttsEngine: localStorage.getItem('ru_tts_engine') || 'neural',
+    ttsEngine: localStorage.getItem('ru_tts_engine') || 'browser',
     aiVoice: localStorage.getItem('ru_ai_voice') || 'ru-RU-SvetlanaNeural',
     aiPitch: parseInt(localStorage.getItem('ru_ai_pitch') || '35', 10), // デフォルト: +35Hz (自然なアニメヒロイン調)
     aiRate: parseInt(localStorage.getItem('ru_ai_rate') || '0', 10),   // デフォルト: 0% (標準話速)
@@ -153,13 +153,16 @@
       playOnlineGoogleTts(cleanText, onEnd);
       return;
     }
-    window.speechSynthesis.cancel(); // 連続再生防止
+
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
+    } catch(e) {}
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'ru-RU';
-    utterance.rate = state.ttsSpeed;
+    utterance.rate = state.ttsSpeed || 1.0;
 
-    // 選択された話者（またはロシア語音声）を設定
     const voices = window.speechSynthesis.getVoices();
     let chosenVoice = null;
 
@@ -173,17 +176,42 @@
       utterance.voice = chosenVoice;
     }
 
-    utterance.onerror = () => {
-      playOnlineGoogleTts(cleanText, onEnd);
+    let finished = false;
+    const finishHandler = () => {
+      if (finished) return;
+      finished = true;
+      if (onEnd) onEnd();
     };
 
-    if (onEnd) {
-      utterance.onend = onEnd;
-    }
+    utterance.onend = finishHandler;
+
+    utterance.onerror = (e) => {
+      console.warn('[SpeechSynthesis error, falling back to Google TTS]:', e);
+      if (!finished) {
+        finished = true;
+        playOnlineGoogleTts(cleanText, onEnd);
+      }
+    };
+
+    // iOS WebKit では発音データがダウンロードされていない場合、onend も onerror も発火しないことがあるためタイマー監視
+    const fallbackTimer = setTimeout(() => {
+      if (!finished && !window.speechSynthesis.speaking) {
+        console.warn('[SpeechSynthesis timeout, falling back to Google TTS]');
+        finished = true;
+        playOnlineGoogleTts(cleanText, onEnd);
+      }
+    }, 1200);
+
+    const origFinish = finishHandler;
+    utterance.onend = () => {
+      clearTimeout(fallbackTimer);
+      origFinish();
+    };
 
     try {
       window.speechSynthesis.speak(utterance);
     } catch (e) {
+      clearTimeout(fallbackTimer);
       playOnlineGoogleTts(cleanText, onEnd);
     }
   }

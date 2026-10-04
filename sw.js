@@ -1,4 +1,4 @@
-const CACHE_NAME = 'russian-vocab-cache-v1';
+const CACHE_NAME = 'russian-vocab-cache-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -6,12 +6,12 @@ const ASSETS_TO_CACHE = [
   './app.js',
   './manifest.json',
   './app_icon.png',
-  './data/vocab_data.js',
-  './data/vocab_data.json',
-  './data/stage1.json',
-  './data/stage2.json',
-  './data/stage3.json',
-  './data/stage4.json'
+  './vocab_data.js',
+  './vocab_data.json',
+  './stage1.json',
+  './stage2.json',
+  './stage3.json',
+  './stage4.json'
 ];
 
 self.addEventListener('install', (event) => {
