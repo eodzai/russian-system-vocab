@@ -522,7 +522,7 @@
     }
 
     try {
-      const resp = await fetch('data/vocab_data.json');
+      const resp = await fetch('vocab_data.json');
       state.allVocab = await resp.json();
       onDataReady();
     } catch (err) {
